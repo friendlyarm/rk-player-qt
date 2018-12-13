@@ -72,8 +72,8 @@ public:
     Player(QWidget *parent = 0);
     ~Player();
 
+    void autoPlay();
     bool isPlayerAvailable() const;
-
     void addToPlaylist(const QList<QUrl> urls);
 
 signals:
@@ -81,6 +81,7 @@ signals:
 
 private slots:
     void play();
+    void autoPlayFunc();
     void open();
     void durationChanged(qint64 duration);
     void positionChanged(qint64 progress);
@@ -141,6 +142,7 @@ private:
 
     QBoxLayout *controlLayout;
     QBoxLayout *layout;
+    QTimer *autoPlayTimer;
 };
 
 #endif // PLAYER_H

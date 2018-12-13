@@ -41,12 +41,20 @@
 #include "player.h"
 
 #include <QApplication>
+#include <QDesktopWidget>
 #include <QCommandLineParser>
 #include <QCommandLineOption>
 #include <QDir>
+#include <semaphore.h>
+#include <stdio.h>
+#include <fcntl.h>
+#include "runguard.h"
 
 int main(int argc, char *argv[])
 {
+    RunGuard guard( "friendlyelec-player-qt5" );
+    if ( !guard.tryToRun() )
+        return 0;
     QApplication app(argc, argv);
 
     QCoreApplication::setApplicationName("FriendlyELEC Player");
@@ -66,12 +74,15 @@ int main(int argc, char *argv[])
         foreach (const QString &a, parser.positionalArguments())
             urls.append(QUrl::fromUserInput(a, QDir::currentPath(), QUrl::AssumeLocalFile));
         player.addToPlaylist(urls);
+        player.autoPlay();
     }
 
 #if defined(Q_WS_SIMULATOR)
     player.setAttribute(Qt::WA_LockLandscapeOrientation);
     player.showMaximized();
 #else
+    player.adjustSize();
+    player.move(QApplication::desktop()->screen()->rect().center() - player.rect().center());
     player.show();
 #endif
     return app.exec();

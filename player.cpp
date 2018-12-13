@@ -205,6 +205,9 @@ Player::Player(QWidget *parent)
     this->installEventFilter(this);
 
     metaDataChanged();
+    autoPlayTimer = new QTimer(this);
+    autoPlayTimer->setSingleShot(true);
+    connect(autoPlayTimer, SIGNAL(timeout()), this, SLOT(autoPlayFunc()));
 }
 
 Player::~Player()
@@ -296,6 +299,20 @@ void Player::jump(const QModelIndex &index)
 {
     if (index.isValid()) {
         playlist->setCurrentIndex(index.row());
+        player->play();
+    }
+}
+
+void Player::autoPlay() {
+    if (autoPlayTimer->isActive()) {
+        return ;
+    }
+    autoPlayTimer->start(500);
+}
+
+void Player::autoPlayFunc() {
+    if (isPlayerAvailable() && !playlist->isEmpty()) {
+        playlist->setCurrentIndex(0);
         player->play();
     }
 }
